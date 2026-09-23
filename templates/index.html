@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Data Analytics Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .dashboard {
+            width: 90%;
+            margin: 30px auto;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            flex: 1;
+            padding: 25px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 15px 0 0;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        .message {
+            color: #6b7280;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-field label {
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .filter-field input,
+        .filter-field select,
+        .filter-actions button {
+            box-sizing: border-box;
+            min-height: 40px;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-actions button {
+            cursor: pointer;
+            border: 0;
+            color: white;
+            background: #2563eb;
+        }
+
+        .filter-actions .clear-button {
+            background: #6b7280;
+        }
+
+        .results-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .results-table th {
+            color: #374151;
+            background: #f9fafb;
+        }
+
+        .upload-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .upload-actions input,
+        .upload-actions button {
+            min-height: 40px;
+            padding: 8px 10px;
+            font: inherit;
+        }
+
+        .upload-actions button {
+            border: 0;
+            border-radius: 6px;
+            color: white;
+            background: #0f766e;
+            cursor: pointer;
+        }
+
+        .upload-actions button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        .advanced-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .advanced-panel {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .advanced-panel button,
+        .advanced-panel select,
+        .advanced-panel textarea {
+            box-sizing: border-box;
+            width: 100%;
+            margin-top: 8px;
+            padding: 9px;
+            font: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+        .advanced-panel button {
+            color: white;
+            background: #1f2937;
+            cursor: pointer;
+        }
+
+        .advanced-panel textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .advanced-table {
+            width: 100%;
+            margin-top: 12px;
+            border-collapse: collapse;
+        }
+
+        .advanced-table th,
+        .advanced-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .advanced-explanation {
+            padding: 10px;
+            color: #374151;
+            background: #f9fafb;
+        }
+
+        .bottom {
+            display: flex;
+            gap: 25px;
+        }
+
+        .bottom .section {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .cards,
+            .bottom {
+                flex-direction: column;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .advanced-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>BIG DATA ANALYTICS DASHBOARD</h1>
+    </div>
+
+    <div class="dashboard">
+
+        <div class="cards">
+
+            <div class="card">
+                <h2>Total Records</h2>
+                <p id="total-records">Loading...</p>
+            </div>
+
+            <div class="card">
+                <h2>Total Revenue</h2>
+                <p id="total-revenue">Loading...</p>
+            </div>
+
+            <div class="card">
+                <h2>Average Order Value</h2>
+                <p id="average-order">Loading...</p>
+            </div>
+
+            <div class="card">
+                <h2>Products</h2>
+                <p id="total-products">Loading...</p>
+            </div>
+
+            <div class="card">
+                <h2>Cities</h2>
+                <p id="total-cities">Loading...</p>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>Search and Filter Sales</h2>
+            <form id="search-form" class="filter-grid">
+                <div class="filter-field">
+                    <label for="productSearch">Search Product</label>
+                    <input type="text" id="productSearch" placeholder="Search Product">
+                </div>
+
+                <div class="filter-field">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All</option>
+                    </select>
+                </div>
+
+                <div class="filter-field">
+                    <label for="cityFilter">City</label>
+                    <select id="cityFilter">
+                        <option value="">All</option>
+                    </select>
+                </div>
+
+                <div class="filter-field">
+                    <label for="dateFilter">Date</label>
+                    <input type="date" id="dateFilter">
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit">Search</button>
+                    <button type="button" class="clear-button" id="clearButton">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Search Results</h2>
+            <p id="search-message" class="message">Use the filters to search sales records.</p>
+            <div id="results-table-wrapper" class="results-table-wrapper"></div>
+        </div>
+
+        <div class="section">
+            <h2>Upload Dataset</h2>
+            <form id="upload-form" class="upload-actions">
+                <label for="datasetFile">Choose CSV File</label>
+                <input type="file" id="datasetFile" accept=".csv,text/csv">
+                <button type="submit" id="uploadButton">Upload Dataset</button>
+            </form>
+            <p id="upload-message" class="message">No file selected.</p>
+        </div>
+
+        <div class="section">
+            <h2>Advanced MongoDB Features</h2>
+            <div class="advanced-grid">
+                <div class="advanced-panel">
+                    <h3>Indexing</h3>
+                    <button type="button" id="viewIndexesButton">View Indexes</button>
+                    <div id="indexes-output"></div>
+                </div>
+
+                <div class="advanced-panel">
+                    <h3>Aggregation Pipeline</h3>
+                    <button type="button" id="runAggregationButton">Run Aggregation</button>
+                    <p class="advanced-explanation">
+                        $match filters, $project calculates, $group groups,
+                        $sort orders, and $limit returns the top results.
+                    </p>
+                    <div id="aggregation-output"></div>
+                </div>
+
+                <div class="advanced-panel">
+                    <h3>Query Filtering</h3>
+                    <label for="advancedCategoryFilter">Category</label>
+                    <select id="advancedCategoryFilter">
+                        <option value="">All</option>
+                    </select>
+                    <label for="advancedCityFilter">City</label>
+                    <select id="advancedCityFilter">
+                        <option value="">All</option>
+                    </select>
+                    <button type="button" id="runFilterButton">Run Filter</button>
+                    <p class="advanced-explanation">
+                        Browser filters are sent to Flask, and MongoDB returns only matching records.
+                    </p>
+                    <div id="advanced-filter-output"></div>
+                </div>
+
+                <div class="advanced-panel">
+                    <h3>Bulk Operations</h3>
+                    <label for="bulkRecords">Enter records as JSON</label>
+                    <textarea id="bulkRecords">[
+    {
+        "sale_id": 9001,
+        "date": "2026-03-01",
+        "product": "Demo Product",
+        "category": "Demo",
+        "quantity": 1,
+        "price": 100,
+        "city": "Demo City",
+        "state": "Demo State"
+    }
+]</textarea>
+                    <button type="button" id="runBulkButton">Run Bulk Insert</button>
+                    <p id="bulk-message" class="message">Bulk operation will run only when clicked.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="section">
+            <h2>Monthly Revenue</h2>
+            <div class="chart-container">
+                <canvas id="monthlyChart" aria-label="Monthly revenue line chart"></canvas>
+            </div>
+            <p id="monthly-message" class="message"></p>
+        </div>
+
+
+        <div class="bottom">
+
+            <div class="section">
+                <h2>Sales by Category</h2>
+                <div class="chart-container">
+                    <canvas id="categoryChart" aria-label="Sales by category bar chart"></canvas>
+                </div>
+                <p id="category-message" class="message"></p>
+            </div>
+
+            <div class="section">
+                <h2>Sales by City</h2>
+                <p id="city-data">Loading...</p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+        function loadDashboard() {
+            fetch("/api/dashboard")
+                .then(response => response.json())
+                .then(data => {
+
+                    document.getElementById("total-records").textContent =
+                        data.total_records.toLocaleString("en-IN");
+
+                    document.getElementById("total-revenue").textContent =
+                        "₹" + data.total_revenue.toLocaleString("en-IN");
+
+                    document.getElementById("average-order").textContent =
+                        "₹" + data.average_order.toLocaleString("en-IN");
+
+                    document.getElementById("total-products").textContent =
+                        data.products.toLocaleString("en-IN");
+
+                    document.getElementById("total-cities").textContent =
+                        data.cities.toLocaleString("en-IN");
+
+                });
+        }
+
+
+        loadDashboard();
+
+
+        fetch("/api/sales-by-city")
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.length) {
+                    document.getElementById("city-data").textContent =
+                        "No city data available.";
+                    return;
+                }
+
+                let cityText = "";
+
+                data.forEach(item => {
+                    cityText +=
+                        item.city +
+                        " : ₹" +
+                        item.revenue.toLocaleString() +
+                        "<br>";
+                });
+
+                document.getElementById("city-data").innerHTML =
+                    cityText;
+
+            })
+            .catch(() => {
+                document.getElementById("city-data").textContent =
+                    "Unable to load city data.";
+            });
+
+
+        function showChartMessage(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+
+
+        function populateFilter(selectId, url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(values => {
+                    const select = document.getElementById(selectId);
+                    values.forEach(value => {
+                        const option = document.createElement("option");
+                        option.value = value;
+                        option.textContent = value;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(() => {
+                    document.getElementById(selectId).disabled = true;
+                });
+        }
+
+
+        function displaySearchResults(data) {
+            const message = document.getElementById("search-message");
+            const wrapper = document.getElementById("results-table-wrapper");
+            wrapper.innerHTML = "";
+
+            if (!data.length) {
+                message.textContent = "No matching records found.";
+                return;
+            }
+
+            message.textContent = data.length + " matching record(s) found.";
+            const table = document.createElement("table");
+            table.className = "results-table";
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Sale ID</th>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>City</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>`;
+
+            const body = table.querySelector("tbody");
+            data.forEach(item => {
+                const row = document.createElement("tr");
+                ["sale_id", "date", "product", "category", "quantity", "price", "city", "state"]
+                    .forEach(field => {
+                        const cell = document.createElement("td");
+                        cell.textContent = item[field] ?? "";
+                        row.appendChild(cell);
+                    });
+                body.appendChild(row);
+            });
+
+            wrapper.appendChild(table);
+        }
+
+
+        function searchSales() {
+            const params = new URLSearchParams();
+            const product = document.getElementById("productSearch").value.trim();
+            const category = document.getElementById("categoryFilter").value;
+            const city = document.getElementById("cityFilter").value;
+            const date = document.getElementById("dateFilter").value;
+
+            if (product) params.set("product", product);
+            if (category) params.set("category", category);
+            if (city) params.set("city", city);
+            if (date) params.set("date", date);
+
+            fetch("/api/search?" + params.toString())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Search request failed");
+                    }
+                    return response.json();
+                })
+                .then(displaySearchResults)
+                .catch(() => {
+                    document.getElementById("search-message").textContent =
+                        "Unable to load search results.";
+                    document.getElementById("results-table-wrapper").innerHTML = "";
+                });
+        }
+
+
+        populateFilter("categoryFilter", "/api/categories");
+        populateFilter("cityFilter", "/api/cities");
+
+        document.getElementById("search-form").addEventListener("submit", event => {
+            event.preventDefault();
+            searchSales();
+        });
+
+        document.getElementById("clearButton").addEventListener("click", () => {
+            document.getElementById("productSearch").value = "";
+            document.getElementById("categoryFilter").value = "";
+            document.getElementById("cityFilter").value = "";
+            document.getElementById("dateFilter").value = "";
+            document.getElementById("search-message").textContent =
+                "Use the filters to search sales records.";
+            document.getElementById("results-table-wrapper").innerHTML = "";
+        });
+
+
+        function renderAdvancedTable(containerId, columns, data) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+
+            if (!data.length) {
+                container.textContent = "No matching records found.";
+                return;
+            }
+
+            const table = document.createElement("table");
+            table.className = "advanced-table";
+            const head = document.createElement("tr");
+            columns.forEach(column => {
+                const cell = document.createElement("th");
+                cell.textContent = column.label;
+                head.appendChild(cell);
+            });
+            const header = document.createElement("thead");
+            header.appendChild(head);
+            table.appendChild(header);
+
+            const body = document.createElement("tbody");
+            data.forEach(item => {
+                const row = document.createElement("tr");
+                columns.forEach(column => {
+                    const cell = document.createElement("td");
+                    const value = item[column.key];
+                    cell.textContent = column.currency && typeof value === "number"
+                        ? "₹" + value.toLocaleString("en-IN")
+                        : value ?? "";
+                    row.appendChild(cell);
+                });
+                body.appendChild(row);
+            });
+            table.appendChild(body);
+            container.appendChild(table);
+        }
+
+
+        document.getElementById("viewIndexesButton").addEventListener("click", () => {
+            fetch("/api/indexes")
+                .then(response => response.json())
+                .then(data => renderAdvancedTable("indexes-output", [
+                    { key: "name", label: "Index Name" },
+                    { key: "fields", label: "Field" }
+                ], data.map(item => ({
+                    name: item.name,
+                    fields: item.fields.join(", ")
+                }))))
+                .catch(() => {
+                    document.getElementById("indexes-output").textContent =
+                        "Unable to load index information.";
+                });
+        });
+
+
+        document.getElementById("runAggregationButton").addEventListener("click", () => {
+            fetch("/api/advanced-aggregation")
+                .then(response => response.json())
+                .then(data => renderAdvancedTable("aggregation-output", [
+                    { key: "city", label: "City" },
+                    { key: "total_revenue", label: "Total Revenue", currency: true }
+                ], data))
+                .catch(() => {
+                    document.getElementById("aggregation-output").textContent =
+                        "Unable to run aggregation.";
+                });
+        });
+
+
+        document.getElementById("runFilterButton").addEventListener("click", () => {
+            const params = new URLSearchParams();
+            const category = document.getElementById("advancedCategoryFilter").value;
+            const city = document.getElementById("advancedCityFilter").value;
+            if (category) params.set("category", category);
+            if (city) params.set("city", city);
+
+            fetch("/api/advanced-filter?" + params.toString())
+                .then(response => response.json())
+                .then(data => renderAdvancedTable("advanced-filter-output", [
+                    { key: "sale_id", label: "Sale ID" },
+                    { key: "product", label: "Product" },
+                    { key: "category", label: "Category" },
+                    { key: "city", label: "City" }
+                ], data))
+                .catch(() => {
+                    document.getElementById("advanced-filter-output").textContent =
+                        "Unable to run filter.";
+                });
+        });
+
+
+        document.getElementById("runBulkButton").addEventListener("click", () => {
+            const message = document.getElementById("bulk-message");
+            let records;
+            try {
+                records = JSON.parse(document.getElementById("bulkRecords").value);
+            } catch (error) {
+                message.textContent = "Invalid JSON. Please check the records.";
+                return;
+            }
+
+            message.textContent = "Running bulk operation...";
+            fetch("/api/bulk-demo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ records })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) throw new Error(data.message);
+                    message.textContent = data.message + " Inserted: " + data.inserted +
+                        ". Skipped duplicates: " + (data.skipped_duplicates || 0) + ".";
+                    loadDashboard();
+                    loadCharts();
+                })
+                .catch(error => {
+                    message.textContent = error.message || "Bulk operation failed.";
+                });
+        });
+
+
+        populateFilter("advancedCategoryFilter", "/api/categories");
+        populateFilter("advancedCityFilter", "/api/cities");
+
+
+        document.getElementById("upload-form").addEventListener("submit", event => {
+            event.preventDefault();
+            const fileInput = document.getElementById("datasetFile");
+            const uploadButton = document.getElementById("uploadButton");
+            const message = document.getElementById("upload-message");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                message.textContent = "Please select a CSV file.";
+                return;
+            }
+
+            if (!file.name.toLowerCase().endsWith(".csv")) {
+                message.textContent = "Only CSV files are allowed.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+            uploadButton.disabled = true;
+            uploadButton.textContent = "Uploading...";
+            message.textContent = "Uploading...";
+
+            fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
+
+                    message.textContent = data.message + " " + data.inserted +
+                        " records inserted. Skipped duplicates: " + data.skipped_duplicates + ".";
+                    loadDashboard();
+                    loadCharts();
+                    fileInput.value = "";
+                })
+                .catch(error => {
+                    message.textContent = error.message || "Unable to upload dataset.";
+                })
+                .finally(() => {
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = "Upload Dataset";
+                });
+        });
+
+
+        let monthlyChart;
+        let categoryChart;
+
+        function loadCharts() {
+            if (monthlyChart) monthlyChart.destroy();
+            if (categoryChart) categoryChart.destroy();
+
+            if (typeof Chart === "undefined") {
+            showChartMessage("monthly-message", "Charts are unavailable because Chart.js could not be loaded.");
+            showChartMessage("category-message", "Charts are unavailable because Chart.js could not be loaded.");
+            } else {
+            fetch("/api/monthly-revenue")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Monthly revenue request failed");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.length) {
+                        showChartMessage("monthly-message", "No monthly revenue data available.");
+                        return;
+                    }
+
+                    monthlyChart = new Chart(document.getElementById("monthlyChart"), {
+                        type: "line",
+                        data: {
+                            labels: data.map(item => "Month " + item.month),
+                            datasets: [{
+                                label: "Revenue",
+                                data: data.map(item => item.revenue),
+                                borderColor: "#2563eb",
+                                backgroundColor: "rgba(37, 99, 235, 0.15)",
+                                fill: true,
+                                tension: 0.25
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: "Revenue" }
+                                },
+                                x: {
+                                    title: { display: true, text: "Month" }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(() => {
+                    showChartMessage("monthly-message", "Unable to load monthly revenue.");
+                });
+
+            fetch("/api/sales-by-category")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Category request failed");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.length) {
+                        showChartMessage("category-message", "No category data available.");
+                        return;
+                    }
+
+                    categoryChart = new Chart(document.getElementById("categoryChart"), {
+                        type: "bar",
+                        data: {
+                            labels: data.map(item => item.category),
+                            datasets: [{
+                                label: "Revenue",
+                                data: data.map(item => item.revenue),
+                                backgroundColor: "#0f766e"
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: "Revenue" }
+                                },
+                                x: {
+                                    title: { display: true, text: "Category" }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(() => {
+                    showChartMessage("category-message", "Unable to load category data.");
+                });
+            }
+        }
+
+
+        loadCharts();
+
+    </script>
+
+</body>
+</html>

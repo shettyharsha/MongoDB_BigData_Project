@@ -1,0 +1,11 @@
+sale_id,date,product,category,quantity,price,city,state
+1006,2026-01-20,Keyboard,Electronics,4,1500,Bengaluru,Karnataka
+1007,2026-01-21,Monitor,Electronics,2,12000,Mysuru,Karnataka
+1008,2026-01-22,Sofa,Furniture,3,25000,Mumbai,Maharashtra
+1009,2026-01-23,Mouse,Electronics,8,800,Hyderabad,Telangana
+1010,2026-01-24,Desk,Furniture,5,6000,Bengaluru,Karnataka
+1011,2026-01-25,Printer,Electronics,2,15000,Mangaluru,Karnataka
+1012,2026-01-26,Office Chair,Furniture,6,4500,Mysuru,Karnataka
+1013,2026-01-27,Tablet,Electronics,3,18000,Hubballi,Karnataka
+1014,2026-01-28,Bookshelf,Furniture,4,7000,Mumbai,Maharashtra
+1015,2026-01-29,Webcam,Electronics,5,3000,Bengaluru,Karnataka
